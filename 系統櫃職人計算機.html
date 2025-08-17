@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統櫃職人計算機</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 使用 Inter 字體以獲得更好的視覺效果 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* 淺灰色背景 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- 主容器 -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">系統櫃職人計算機</h1>
+        
+        <!-- 切換按鈕 -->
+        <div class="flex justify-center space-x-4 mb-6">
+            <button id="cabinet-btn" class="py-2 px-4 rounded-lg font-semibold transition ease-in-out duration-150 bg-blue-600 text-white shadow-md">
+                系統櫃板材計算
+            </button>
+            <button id="desktop-btn" class="py-2 px-4 rounded-lg font-semibold transition ease-in-out duration-150 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                書桌檯面承重計算
+            </button>
+        </div>
+
+        <!-- 系統櫃板材計算機區塊 -->
+        <div id="cabinet-calculator" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                <div class="flex-1">
+                    <label for="width" class="block text-sm font-medium text-gray-700">櫃體寬度 W (mm)</label>
+                    <input type="number" id="width" min="150" max="900" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                </div>
+                <div class="flex-1">
+                    <label for="depth" class="block text-sm font-medium text-gray-700">櫃體深度 D (mm)</label>
+                    <select id="depth" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                        <option value="190">190</option>
+                        <option value="250">250</option>
+                        <option value="298">298</option>
+                        <option value="350">350</option>
+                        <option value="394">394</option>
+                        <option value="450">450</option>
+                        <option value="530">530</option>
+                        <option value="548">548</option>
+                        <option value="560">560</option>
+                        <option value="586">586</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label for="height" class="block text-sm font-medium text-gray-700">櫃體高度 H (mm)</label>
+                    <input type="number" id="height" min="192" max="2304" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                <div class="flex-1">
+                    <label for="fixedShelves18mm" class="block text-sm font-medium text-gray-700">18固隔 數量</label>
+                    <input type="number" id="fixedShelves18mm" min="0" value="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                </div>
+                <div class="flex-1">
+                    <label for="adjustableShelves18mm" class="block text-sm font-medium text-gray-700">18活隔 數量</label>
+                    <input type="number" id="adjustableShelves18mm" min="0" value="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                <div class="flex-1">
+                    <label for="fixedShelves25mm" class="block text-sm font-medium text-gray-700">25固隔 數量</label>
+                    <input type="number" id="fixedShelves25mm" min="0" value="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                </div>
+                <div class="flex-1">
+                    <label for="adjustableShelves25mm" class="block text-sm font-medium text-gray-700">25活隔 數量</label>
+                    <input type="number" id="adjustableShelves25mm" min="0" value="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border">
+                </div>
+            </div>
+            <!-- 訊息提示區域 -->
+            <div id="message" class="text-red-500 mt-4 text-center hidden"></div>
+            <!-- 計算按鈕 -->
+            <button id="calculateBtn" class="mt-6 w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                計算板材
+            </button>
+            <!-- 計算結果顯示區域 -->
+            <div id="results" class="mt-8 border-t pt-6 border-gray-200 hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">計算結果</h2>
+                <div class="space-y-4">
+                    <div id="dimensions-output"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 書桌檯面承重計算區塊 -->
+        <div id="desktop-calculator" class="space-y-4 hidden">
+            <!-- 輸入欄位 -->
+            <div>
+                <label for="thickness-desktop" class="block text-sm font-medium text-gray-700 mb-1">板厚</label>
+                <select id="thickness-desktop" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="25">25mm</option>
+                    <option value="18">18mm</option>
+                </select>
+            </div>
+            <div>
+                <label for="span-desktop" class="block text-sm font-medium text-gray-700 mb-1">跨距 (mm)</label>
+                <input type="number" id="span-desktop" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="例如：800">
+            </div>
+            <div>
+                <label for="width-desktop" class="block text-sm font-medium text-gray-700 mb-1">板材深度 (mm)</label>
+                <input type="number" id="width-desktop" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="例如：400">
+            </div>
+            <div>
+                <label for="weight-desktop" class="block text-sm font-medium text-gray-700 mb-1">承重重量 (kg)</label>
+                <input type="number" id="weight-desktop" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="例如：10">
+            </div>
+            <div>
+                <label for="loadType-desktop" class="block text-sm font-medium text-gray-700 mb-1">承重類型</label>
+                <select id="loadType-desktop" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="concentrated">集中承重</option>
+                    <option value="distributed">均佈承重</option>
+                </select>
+            </div>
+            <div>
+                <label for="supportType-desktop" class="block text-sm font-medium text-gray-700 mb-1">支撐方式</label>
+                <select id="supportType-desktop" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="cantilever">有安裝全檔板</option>
+                    <option value="simple">無全檔板</option>
+                </select>
+            </div>
+            <!-- 錯誤訊息顯示區 -->
+            <div id="error-message-desktop" class="text-sm text-red-600 text-center hidden"></div>
+            <!-- 計算按鈕 -->
+            <button id="calculate-btn-desktop" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                計算下垂程度
+            </button>
+            <!-- 結果顯示區 -->
+            <div id="result-container-desktop" class="mt-6 pt-4 border-t border-gray-200 hidden">
+                <h2 class="text-xl font-semibold text-gray-800 text-center mb-2">計算結果</h2>
+                <p id="result-desktop" class="text-center text-3xl font-extrabold text-indigo-600">
+                    0.00 mm
+                </p>
+                <p class="text-center text-sm text-gray-500 mt-1">
+                    此計算假設為 <span id="support-type-description-desktop">有安裝全檔板</span>, <span id="load-type-description-desktop">集中承重</span>
+                </p>
+                <p id="board-weight-display-desktop" class="text-center text-sm text-gray-500 mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素參考
+        const cabinetBtn = document.getElementById('cabinet-btn');
+        const desktopBtn = document.getElementById('desktop-btn');
+        const cabinetCalculator = document.getElementById('cabinet-calculator');
+        const desktopCalculator = document.getElementById('desktop-calculator');
+
+        // 切換計算機的函式
+        function switchCalculator(activeCalculatorId) {
+            if (activeCalculatorId === 'cabinet') {
+                cabinetCalculator.classList.remove('hidden');
+                desktopCalculator.classList.add('hidden');
+                cabinetBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                cabinetBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+                desktopBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-md'); // Updated to remove blue classes
+                desktopBtn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            } else {
+                cabinetCalculator.classList.add('hidden');
+                desktopCalculator.classList.remove('hidden');
+                desktopBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                desktopBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md'); // Updated to add blue classes
+                cabinetBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                cabinetBtn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            }
+        }
+
+        // 綁定按鈕事件
+        cabinetBtn.addEventListener('click', () => switchCalculator('cabinet'));
+        desktopBtn.addEventListener('click', () => switchCalculator('desktop'));
+
+        // --- 系統櫃板材計算機邏輯 ---
+        document.getElementById('calculateBtn').addEventListener('click', () => {
+            // 取得輸入值並轉換為數字
+            const W = parseFloat(document.getElementById('width').value);
+            const D = parseFloat(document.getElementById('depth').value);
+            const H = parseFloat(document.getElementById('height').value);
+            const fixedShelves18mmCount = parseInt(document.getElementById('fixedShelves18mm').value);
+            const adjustableShelves18mmCount = parseInt(document.getElementById('adjustableShelves18mm').value);
+            const fixedShelves25mmCount = parseInt(document.getElementById('fixedShelves25mm').value);
+            const adjustableShelves25mmCount = parseInt(document.getElementById('adjustableShelves25mm').value);
+
+            const messageDiv = document.getElementById('message');
+            const resultsDiv = document.getElementById('results');
+            
+            // 驗證輸入範圍
+            if (isNaN(W) || isNaN(H) || W < 150 || W > 900 || H < 192 || H > 2304 || D <= 0 || fixedShelves18mmCount < 0 || adjustableShelves18mmCount < 0 || fixedShelves25mmCount < 0 || adjustableShelves25mmCount < 0) {
+                messageDiv.textContent = '請輸入有效的尺寸：寬度(150-900mm)、高度(192-2304mm)與非負數的隔板數量。';
+                messageDiv.classList.remove('hidden');
+                resultsDiv.classList.add('hidden');
+                return;
+            } else {
+                messageDiv.classList.add('hidden');
+            }
+
+            // 計算各板材尺寸
+            // 頂板/底板 (18mm)
+            const topBottomWidth = W - 37;
+            const topBottomDepth = D;
+
+            // 側板 (18mm)
+            const sideWidth = D;
+            const sideHeight = H;
+
+            // 背板 (8mm)
+            const backWidth = W - 27;
+            const backHeight = H - 27;
+
+            // 18mm 固隔
+            const fixedShelf18mmWidth = W - 37;
+            const fixedShelf18mmDepth = D - 29;
+            const shelf18FixedArea = fixedShelf18mmWidth * fixedShelf18mmDepth;
+
+            // 18mm 活隔
+            const adjustableShelf18mmWidth = W - 38;
+            const adjustableShelf18mmDepth = D - 44;
+            const shelf18AdjArea = adjustableShelf18mmWidth * adjustableShelf18mmDepth;
+
+            // 25mm 固隔
+            const fixedShelf25mmWidth = W - 37;
+            const fixedShelf25mmDepth = D - 29;
+            const shelf25FixedArea = fixedShelf25mmWidth * fixedShelf25mmDepth;
+
+            // 25mm 活隔
+            const adjustableShelf25mmWidth = W - 38;
+            const adjustableShelf25mmDepth = D - 44;
+            const shelf25AdjArea = adjustableShelf25mmWidth * adjustableShelf25mmDepth;
+
+            // 背拉桿 (18mm)
+            let backBracesCount = 0;
+            if (H >= 960 && H <= 2303) {
+                backBracesCount = 1;
+            } else if (H === 2304) {
+                backBracesCount = 2;
+            }
+            const backBraceWidth = W - 37;
+            const backBraceHeight = 100;
+
+            // 計算不同厚度板材的總面積
+            let totalArea18mm = 0;
+            let totalArea8mm = 0;
+            let totalArea25mm = 0;
+
+            // 18mm 板材面積計算
+            totalArea18mm += topBottomWidth * topBottomDepth; // 頂板
+            totalArea18mm += topBottomWidth * topBottomDepth; // 底板
+            totalArea18mm += sideWidth * sideHeight * 2; // 側板 (兩片)
+            totalArea18mm += shelf18FixedArea * fixedShelves18mmCount; // 18固隔
+            totalArea18mm += shelf18AdjArea * adjustableShelves18mmCount; // 18活隔
+            totalArea18mm += (backBraceWidth * backBraceHeight) * backBracesCount; // 背拉桿
+
+            // 8mm 背板面積計算
+            totalArea8mm += backWidth * backHeight;
+
+            // 25mm 板材面積計算
+            totalArea25mm += shelf25FixedArea * fixedShelves25mmCount; // 25固隔
+            totalArea25mm += shelf25AdjArea * adjustableShelves25mmCount; // 25活隔
+
+            // 計算總重量
+            const totalWeight = (totalArea18mm * 0.000012) + (totalArea8mm * 0.000006) + (totalArea25mm * 0.0000178);
+            
+            // 隔板下垂計算
+            const E18 = 1950; // 18mm板彈性模數 N/mm²
+            const E25 = 1850; // 25mm板彈性模數 N/mm²
+            const L = W - 55; // 跨距
+            const g = 9.81; // 重力加速度 m/s²
+
+            // 面積慣性矩 (I = b * h^3 / 12)
+            const I18_fixed = (fixedShelf18mmDepth * Math.pow(18, 3)) / 12;
+            const I18_adj = (adjustableShelf18mmDepth * Math.pow(18, 3)) / 12;
+            const I25_fixed = (fixedShelf25mmDepth * Math.pow(25, 3)) / 12;
+            const I25_adj = (adjustableShelf25mmDepth * Math.pow(25, 3)) / 12;
+
+            // 隔板本身重量 (均佈承重)
+            const weight18Fixed = shelf18FixedArea * 0.000012; // kg
+            const weight18Adj = shelf18AdjArea * 0.000012; // kg
+            const weight25Fixed = shelf25FixedArea * 0.0000178; // kg
+            const weight25Adj = shelf25AdjArea * 0.0000178; // kg
+            
+            // 下垂計算函數: 
+            // 總下垂 = 點負載下垂 + 均佈負載下垂
+            // 點負載下垂: (P * L^3) / (48 * E * I)
+            // 均佈負載下垂: (5 * w * L^4) / (384 * E * I), w是每單位長度的負載
+            const calculateTotalDeflection = (pointLoadKg, distributedLoadKg, E, I) => {
+                if (I === 0) return 0;
+                // 點負載力 (N)
+                const P_point = pointLoadKg * g;
+                // 均佈負載 (N/mm)
+                const w_distributed = (distributedLoadKg * g) / L;
+
+                const deflectionPoint = (P_point * Math.pow(L, 3)) / (48 * E * I);
+                const deflectionDistributed = (5 * w_distributed * Math.pow(L, 4)) / (384 * E * I);
+
+                return deflectionPoint + deflectionDistributed;
+            };
+
+            // 18mm 隔板下垂計算 (固隔與活隔)
+            const deflection18FixedNoLoad = calculateTotalDeflection(0, weight18Fixed, E18, I18_fixed);
+            const deflection18Fixed10kg = calculateTotalDeflection(10, weight18Fixed, E18, I18_fixed);
+            const deflection18Fixed15kg = calculateTotalDeflection(15, weight18Fixed, E18, I18_fixed);
+            const deflection18Fixed20kg = calculateTotalDeflection(20, weight18Fixed, E18, I18_fixed);
+            
+            const deflection18AdjNoLoad = calculateTotalDeflection(0, weight18Adj, E18, I18_adj);
+            const deflection18Adj10kg = calculateTotalDeflection(10, weight18Adj, E18, I18_adj);
+            const deflection18Adj15kg = calculateTotalDeflection(15, weight18Adj, E18, I18_adj);
+            const deflection18Adj20kg = calculateTotalDeflection(20, weight18Adj, E18, I18_adj);
+            
+            // 25mm 隔板下垂計算 (固隔與活隔)
+            const deflection25FixedNoLoad = calculateTotalDeflection(0, weight25Fixed, E25, I25_fixed);
+            const deflection25Fixed10kg = calculateTotalDeflection(10, weight25Fixed, E25, I25_fixed);
+            const deflection25Fixed15kg = calculateTotalDeflection(15, weight25Fixed, E25, I25_fixed);
+            const deflection25Fixed20kg = calculateTotalDeflection(20, weight25Fixed, E25, I25_fixed);
+            
+            const deflection25AdjNoLoad = calculateTotalDeflection(0, weight25Adj, E25, I25_adj);
+            const deflection25Adj10kg = calculateTotalDeflection(10, weight25Adj, E25, I25_adj);
+            const deflection25Adj15kg = calculateTotalDeflection(15, weight25Adj, E25, I25_adj);
+            const deflection25Adj20kg = calculateTotalDeflection(20, weight25Adj, E25, I25_adj);
+
+            // 格式化輸出
+            const dimensionsOutput = `
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                    <li>頂板尺寸：${Math.round(topBottomWidth)} x ${Math.round(topBottomDepth)} mm</li>
+                    <li>底板尺寸：${Math.round(topBottomWidth)} x ${Math.round(topBottomDepth)} mm</li>
+                    <li>側板尺寸 (x2)：${Math.round(sideWidth)} x ${Math.round(sideHeight)} mm</li>
+                    <li>背板尺寸：${Math.round(backWidth)} x ${Math.round(backHeight)} mm</li>
+                    ${fixedShelves18mmCount > 0 ? `<li>18固隔尺寸 (x${fixedShelves18mmCount})：${Math.round(fixedShelf18mmWidth)} x ${Math.round(fixedShelf18mmDepth)} mm</li>` : ''}
+                    ${adjustableShelves18mmCount > 0 ? `<li>18活隔尺寸 (x${adjustableShelves18mmCount})：${Math.round(adjustableShelf18mmWidth)} x ${Math.round(adjustableShelf18mmDepth)} mm</li>` : ''}
+                    ${fixedShelves25mmCount > 0 ? `<li>25固隔尺寸 (x${fixedShelves25mmCount})：${Math.round(fixedShelf25mmWidth)} x ${Math.round(fixedShelf25mmDepth)} mm</li>` : ''}
+                    ${adjustableShelves25mmCount > 0 ? `<li>25活隔尺寸 (x${adjustableShelves25mmCount})：${Math.round(adjustableShelf25mmWidth)} x ${Math.round(adjustableShelf25mmDepth)} mm</li>` : ''}
+                    ${backBracesCount > 0 ? `<li>背拉桿尺寸 (x${backBracesCount})：${Math.round(backBraceWidth)} x ${Math.round(backBraceHeight)} mm</li>` : ''}
+                </ul>
+                <div class="border-t pt-4 mt-4 border-dashed border-gray-300">
+                    <p class="text-lg font-medium text-gray-700">櫃體總重量: <span id="totalWeight" class="font-bold text-blue-600">${totalWeight.toFixed(1)}</span> 公斤</p>
+                </div>
+                <div class="mt-4 border-t pt-4 border-dashed border-gray-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">隔板下垂尺寸計算 (中央放置重物)</h3>
+                    <p class="text-gray-600 mb-2">備註：此計算已將隔板本身的重量納入考量。</p>
+                    ${(fixedShelves18mmCount > 0 || adjustableShelves18mmCount > 0) ? `
+                        <h4 class="text-lg font-medium text-gray-700 mt-4">18mm 隔板</h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600">
+                            <li>無重物下垂尺寸：${deflection18FixedNoLoad.toFixed(3)} mm</li>
+                            <li>放置10KG重物下垂尺寸：${deflection18Fixed10kg.toFixed(3)} mm</li>
+                            <li>放置15KG重物下垂尺寸：${deflection18Fixed15kg.toFixed(3)} mm</li>
+                            <li>放置20KG重物下垂尺寸：${deflection18Fixed20kg.toFixed(3)} mm</li>
+                        </ul>
+                    ` : ''}
+                    ${(fixedShelves25mmCount > 0 || adjustableShelves25mmCount > 0) ? `
+                        <h4 class="text-lg font-medium text-gray-700 mt-4">25mm 隔板</h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600">
+                            <li>無重物下垂尺寸：${deflection25FixedNoLoad.toFixed(3)} mm</li>
+                            <li>放置10KG重物下垂尺寸：${deflection25Fixed10kg.toFixed(3)} mm</li>
+                            <li>放置15KG重物下垂尺寸：${deflection25Fixed15kg.toFixed(3)} mm</li>
+                            <li>放置20KG重物下垂尺寸：${deflection25Fixed20kg.toFixed(3)} mm</li>
+                        </ul>
+                    ` : ''}
+                    <p class="text-sm italic text-red-500 mt-2">計算結果是基於理論計算，而非實驗數據。</p>
+                </div>
+            `;
+
+            // 更新結果顯示區的內容
+            document.getElementById('dimensions-output').innerHTML = dimensionsOutput;
+            
+            resultsDiv.classList.remove('hidden');
+        });
+
+        // --- 書桌檯面承重計算邏輯 ---
+        const thicknessSelectDesktop = document.getElementById('thickness-desktop');
+        const spanInputDesktop = document.getElementById('span-desktop');
+        const widthInputDesktop = document.getElementById('width-desktop');
+        const weightInputDesktop = document.getElementById('weight-desktop');
+        const loadTypeSelectDesktop = document.getElementById('loadType-desktop');
+        const supportTypeSelectDesktop = document.getElementById('supportType-desktop');
+        const calculateBtnDesktop = document.getElementById('calculate-btn-desktop');
+        const resultDisplayDesktop = document.getElementById('result-desktop');
+        const errorMessageDesktop = document.getElementById('error-message-desktop');
+        const loadTypeDescriptionDesktop = document.getElementById('load-type-description-desktop');
+        const supportTypeDescriptionDesktop = document.getElementById('support-type-description-desktop');
+        const resultContainerDesktop = document.getElementById('result-container-desktop');
+        const boardWeightDisplayDesktop = document.getElementById('board-weight-display-desktop');
+
+        const E_values_desktop = {
+            '18': 1950,
+            '25': 1850
+        };
+        const unit_weights_desktop = {
+            '18': 0.000012,
+            '25': 0.0000178
+        };
+
+        calculateBtnDesktop.addEventListener('click', () => {
+            errorMessageDesktop.textContent = '';
+            errorMessageDesktop.classList.add('hidden');
+            resultContainerDesktop.classList.add('hidden');
+
+            const thickness = parseFloat(thicknessSelectDesktop.value);
+            const span = parseFloat(spanInputDesktop.value);
+            const width = parseFloat(widthInputDesktop.value);
+            const weight = parseFloat(weightInputDesktop.value);
+            const loadType = loadTypeSelectDesktop.value;
+            const supportType = supportTypeSelectDesktop.value;
+
+            if (isNaN(span) || isNaN(width) || isNaN(weight) || span <= 0 || width <= 0 || weight < 0) {
+                errorMessageDesktop.textContent = '跨距與板材深度必須為正數，承重重量須為0或以上。';
+                errorMessageDesktop.classList.remove('hidden');
+                resultDisplayDesktop.textContent = '0.00 mm';
+                return;
+            }
+
+            const board_area_mm2 = span * width;
+            const board_weight_kg = board_area_mm2 * unit_weights_desktop[thickness];
+            const board_weight_N = board_weight_kg * 9.8; 
+
+            const P = weight * 9.8; 
+            const E = E_values_desktop[thickness];
+            const I = (width * Math.pow(thickness, 3)) / 12;
+            let totalDeflection = 0;
+
+            if (supportType === 'simple') {
+                supportTypeDescriptionDesktop.textContent = '無全檔板';
+                if (loadType === 'concentrated') {
+                    const deflectionFromUserWeight = (P * Math.pow(span, 3)) / (48 * E * I);
+                    const deflectionFromBoardWeight = (5 * board_weight_N * Math.pow(span, 3)) / (384 * E * I);
+                    totalDeflection = deflectionFromUserWeight + deflectionFromBoardWeight;
+                    loadTypeDescriptionDesktop.textContent = '集中承重';
+                } else if (loadType === 'distributed') {
+                    const totalDistributedWeightN = P + board_weight_N;
+                    totalDeflection = (5 * totalDistributedWeightN * Math.pow(span, 3)) / (384 * E * I);
+                    loadTypeDescriptionDesktop.textContent = '均佈承重';
+                }
+            } else if (supportType === 'cantilever') {
+                supportTypeDescriptionDesktop.textContent = '有安裝全檔板';
+                if (loadType === 'concentrated') {
+                    const deflectionFromUserWeight = (P * Math.pow(span, 3)) / (192 * E * I);
+                    const deflectionFromBoardWeight = (board_weight_N * Math.pow(span, 3)) / (384 * E * I);
+                    totalDeflection = deflectionFromUserWeight + deflectionFromBoardWeight;
+                    loadTypeDescriptionDesktop.textContent = '集中承重';
+                } else if (loadType === 'distributed') {
+                    const totalDistributedWeightN = P + board_weight_N;
+                    totalDeflection = (totalDistributedWeightN * Math.pow(span, 3)) / (384 * E * I);
+                    loadTypeDescriptionDesktop.textContent = '均佈承重';
+                }
+            }
+
+            resultDisplayDesktop.textContent = `${totalDeflection.toFixed(3)} mm`;
+            boardWeightDisplayDesktop.textContent = `板材自重：${board_weight_kg.toFixed(3)} kg`;
+            resultContainerDesktop.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
