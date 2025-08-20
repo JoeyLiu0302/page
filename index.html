@@ -21,11 +21,11 @@
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">系統櫃職人計算機</h1>
         
         <!-- 切換按鈕 -->
-        <div class="flex justify-center space-x-4 mb-6">
-            <button id="cabinet-btn" class="py-2 px-4 rounded-lg font-semibold transition ease-in-out duration-150 bg-blue-600 text-white shadow-md">
+        <div class="flex justify-center items-stretch space-x-4 mb-6">
+            <button id="cabinet-btn" class="flex-1 py-2 px-4 rounded-lg font-semibold transition ease-in-out duration-150 bg-blue-600 text-white shadow-md">
                 系統櫃板材計算
             </button>
-            <button id="desktop-btn" class="py-2 px-4 rounded-lg font-semibold transition ease-in-out duration-150 bg-gray-200 text-gray-700 hover:bg-gray-300">
+            <button id="desktop-btn" class="flex-1 py-2 px-4 rounded-lg font-semibold transition ease-in-out duration-150 bg-gray-200 text-gray-700 hover:bg-gray-300">
                 書桌檯面承重計算
             </button>
         </div>
@@ -163,13 +163,13 @@
                 desktopCalculator.classList.add('hidden');
                 cabinetBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
                 cabinetBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-                desktopBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-md'); // Updated to remove blue classes
+                desktopBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
                 desktopBtn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
             } else {
                 cabinetCalculator.classList.add('hidden');
                 desktopCalculator.classList.remove('hidden');
                 desktopBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                desktopBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md'); // Updated to add blue classes
+                desktopBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
                 cabinetBtn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
                 cabinetBtn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
             }
@@ -274,6 +274,7 @@
             const E25 = 1850; // 25mm板彈性模數 N/mm²
             const L = W - 55; // 跨距
             const g = 9.81; // 重力加速度 m/s²
+            const creepFactor = 2.5; // 簡化蠕變係數，用於估算永久變形
 
             // 面積慣性矩 (I = b * h^3 / 12)
             const I18_fixed = (fixedShelf18mmDepth * Math.pow(18, 3)) / 12;
@@ -309,7 +310,7 @@
             const deflection18Fixed10kg = calculateTotalDeflection(10, weight18Fixed, E18, I18_fixed);
             const deflection18Fixed15kg = calculateTotalDeflection(15, weight18Fixed, E18, I18_fixed);
             const deflection18Fixed20kg = calculateTotalDeflection(20, weight18Fixed, E18, I18_fixed);
-            
+
             const deflection18AdjNoLoad = calculateTotalDeflection(0, weight18Adj, E18, I18_adj);
             const deflection18Adj10kg = calculateTotalDeflection(10, weight18Adj, E18, I18_adj);
             const deflection18Adj15kg = calculateTotalDeflection(15, weight18Adj, E18, I18_adj);
@@ -325,6 +326,23 @@
             const deflection25Adj10kg = calculateTotalDeflection(10, weight25Adj, E25, I25_adj);
             const deflection25Adj15kg = calculateTotalDeflection(15, weight25Adj, E25, I25_adj);
             const deflection25Adj20kg = calculateTotalDeflection(20, weight25Adj, E25, I25_adj);
+            
+            // 新增：計算一年後的下垂尺寸 (加入蠕變係數)
+            const deflection18Fixed1Year10kg = deflection18Fixed10kg * creepFactor;
+            const deflection18Fixed1Year15kg = deflection18Fixed15kg * creepFactor;
+            const deflection18Fixed1Year20kg = deflection18Fixed20kg * creepFactor;
+
+            const deflection18Adj1Year10kg = deflection18Adj10kg * creepFactor;
+            const deflection18Adj1Year15kg = deflection18Adj15kg * creepFactor;
+            const deflection18Adj1Year20kg = deflection18Adj20kg * creepFactor;
+
+            const deflection25Fixed1Year10kg = deflection25Fixed10kg * creepFactor;
+            const deflection25Fixed1Year15kg = deflection25Fixed15kg * creepFactor;
+            const deflection25Fixed1Year20kg = deflection25Fixed20kg * creepFactor;
+            
+            const deflection25Adj1Year10kg = deflection25Adj10kg * creepFactor;
+            const deflection25Adj1Year15kg = deflection25Adj15kg * creepFactor;
+            const deflection25Adj1Year20kg = deflection25Adj20kg * creepFactor;
 
             // 格式化輸出
             const dimensionsOutput = `
@@ -363,7 +381,27 @@
                             <li>放置20KG重物下垂尺寸：${deflection25Fixed20kg.toFixed(3)} mm</li>
                         </ul>
                     ` : ''}
-                    <p class="text-sm italic text-red-500 mt-2">計算結果是基於理論計算，而非實驗數據。</p>
+                </div>
+                <div class="mt-4 border-t pt-4 border-dashed border-gray-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">潛變效應估計 (永久變形)</h3>
+                    <p class="text-sm italic text-red-500 mb-2">備註：此為基於材料潛變效應的簡化預估，實際值可能因環境、濕度等因素而異。</p>
+                    ${(fixedShelves18mmCount > 0 || adjustableShelves18mmCount > 0) ? `
+                        <h4 class="text-lg font-medium text-gray-700 mt-4">18mm 隔板</h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600">
+                            <li>放置10KG重物下垂尺寸：${deflection18Fixed1Year10kg.toFixed(3)} mm</li>
+                            <li>放置15KG重物下垂尺寸：${deflection18Fixed1Year15kg.toFixed(3)} mm</li>
+                            <li>放置20KG重物下垂尺寸：${deflection18Fixed1Year20kg.toFixed(3)} mm</li>
+                        </ul>
+                    ` : ''}
+                    ${(fixedShelves25mmCount > 0 || adjustableShelves25mmCount > 0) ? `
+                        <h4 class="text-lg font-medium text-gray-700 mt-4">25mm 隔板</h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600">
+                            <li>放置10KG重物下垂尺寸：${deflection25Fixed1Year10kg.toFixed(3)} mm</li>
+                            <li>放置15KG重物下垂尺寸：${deflection25Fixed1Year15kg.toFixed(3)} mm</li>
+                            <li>放置20KG重物下垂尺寸：${deflection25Fixed1Year20kg.toFixed(3)} mm</li>
+                        </ul>
+                    ` : ''}
+                    <p class="text-sm italic text-red-500 mt-2">以上結果是基於理論計算，而非實驗數據。</p>
                 </div>
             `;
 
