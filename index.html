@@ -267,7 +267,7 @@
             totalArea25mm += shelf25AdjArea * adjustableShelves25mmCount; // 25活隔
 
             // 計算總重量
-            const totalWeight = (totalArea18mm * 0.000013) + (totalArea8mm * 0.0000065) + (totalArea25mm * 0.0000178);
+            const totalWeight = (totalArea18mm * 0.0000125) + (totalArea8mm * 0.00000625) + (totalArea25mm * 0.0000178);
             
             // 隔板下垂計算
             const E18 = 1950; // 18mm板彈性模數 N/mm²
@@ -283,8 +283,8 @@
             const I25_adj = (adjustableShelf25mmDepth * Math.pow(25, 3)) / 12;
 
             // 隔板本身重量 (均佈承重)
-            const weight18Fixed = shelf18FixedArea * 0.000013; // kg
-            const weight18Adj = shelf18AdjArea * 0.000013; // kg
+            const weight18Fixed = shelf18FixedArea * 0.0000125; // kg
+            const weight18Adj = shelf18AdjArea * 0.0000125; // kg
             const weight25Fixed = shelf25FixedArea * 0.0000178; // kg
             const weight25Adj = shelf25AdjArea * 0.0000178; // kg
             
@@ -431,7 +431,7 @@
             '25': 1850
         };
         const unit_weights_desktop = {
-            '18': 0.000012,
+            '18': 0.0000125,
             '25': 0.0000178
         };
 
@@ -496,6 +496,7 @@
     </script>
 </body>
 </html>
+
 
 
 
